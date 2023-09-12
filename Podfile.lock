@@ -1,0 +1,20 @@
+PODS:
+  - Alamofire (5.8.0)
+  - SnapKit (5.6.0)
+
+DEPENDENCIES:
+  - Alamofire
+  - SnapKit (~> 5.6.0)
+
+SPEC REPOS:
+  trunk:
+    - Alamofire
+    - SnapKit
+
+SPEC CHECKSUMS:
+  Alamofire: 0e92e751b3e9e66d7982db43919d01f313b8eb91
+  SnapKit: e01d52ebb8ddbc333eefe2132acf85c8227d9c25
+
+PODFILE CHECKSUM: 4dcb4a18359ed1d10a1578cb0cf4a35684b17699
+
+COCOAPODS: 1.12.1
