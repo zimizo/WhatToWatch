@@ -106,14 +106,21 @@ class MovieDetailsViewController: UIViewController{
         return view
     }()
     
-    private var movieId: Int? = nil
+    private var movieId: Int
 
     private var viewModel: MovieViewModel? = nil
     
-    let service = MovieService()
+    private let networkManager: NetworkManagerProtocol
 
-
-
+    init(_ movieId: Int, networkManager: NetworkManagerProtocol = NetworkManager()) {
+        self.networkManager = networkManager
+        self.movieId = movieId
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -131,14 +138,32 @@ class MovieDetailsViewController: UIViewController{
         loadData()
     }
     
-    private func dataDidLoad(_ result: MovieViewModel?, _ err: Bool) -> Void {
-        DispatchQueue.main.async {
-            if(!err){
-                self.viewModel = result
-                self.loadContentIndicator.stopAnimating()
-                self.loadContentIndicator.isHidden = true
-                self.setupView()
-                self.setupConstraits()
+    private func dataDidLoad(_ data: MovieViewModel?) -> Void {
+
+            if let vm = data{
+                viewModel = vm
+                
+                loadContentIndicator.stopAnimating()
+                loadContentIndicator.isHidden = true
+                
+                setupView()
+                setupConstraits()
+                
+                imdbRatingLabel.text = "\(vm.ratingImdb ?? 0.0)"
+                kinopoiskRatingLabel.text = "\(vm.ratingKinopoisk ?? 0.0)"
+                ruNameLabel.text = vm.nameRu
+                originalNameLabel.text = vm.nameOriginal
+                descriptionLabel.text = vm.description
+                yearValueLabel.text = "\(vm.year ?? 0)"
+                filmLengthValueLabel.text = "\(vm.filmLength ?? 0) мин."
+                
+                if let urlString = vm.posterUrl {
+                    networkManager.getImage(for: urlString) { image in
+                            self.previewImage.image = image ?? self.errorImage
+                            self.loadImageIndicator.stopAnimating()
+                            self.loadImageIndicator.isHidden = true
+                    }
+                }
             }
             else{
                 self.loadContentIndicator.stopAnimating()
@@ -155,16 +180,12 @@ class MovieDetailsViewController: UIViewController{
                 }
             }
         }
-    }
 
     
     func loadData(){
-        DispatchQueue.global(qos: .userInitiated).async {
-            [weak self] in
-            guard let self = self else { return }
-            self.service.getMovieById(self.movieId!, self.dataDidLoad)
-        }
+        networkManager.getMovie(by: movieId, completion: dataDidLoad)
     }
+    
     func setupView(){
         configureView(viewModel!)
         view.addSubview(previewImage)
@@ -271,23 +292,9 @@ class MovieDetailsViewController: UIViewController{
         queue.async {[weak self] in
             guard let self = self else {return}
             
-            let uiimage = self.service.loadImage(urlString: vm.posterUrl ?? "") ?? self.errorImage
-            
-            
-            DispatchQueue.main.async {
-                self.previewImage.image = uiimage
-                self.loadImageIndicator.stopAnimating()
-                self.loadImageIndicator.isHidden = true
-            }
         }
         
-        imdbRatingLabel.text = "\(vm.ratingImdb ?? 0.0)"
-        kinopoiskRatingLabel.text = "\(vm.ratingKinopoisk ?? 0.0)"
-        ruNameLabel.text = vm.nameRu
-        originalNameLabel.text = vm.nameOriginal
-        descriptionLabel.text = vm.description
-        yearValueLabel.text = "\(vm.year ?? 0)"
-        filmLengthValueLabel.text = "\(vm.filmLength ?? 0) мин."
+
     }
     
     func setMovieId(_ id: Int){

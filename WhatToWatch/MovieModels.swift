@@ -17,8 +17,9 @@ struct MovieViewModel: Codable {
     let description: String?
 }
 
-struct MoviesListViewModel:Codable{
+struct MoviesListViewModel: Codable {
     var films: [MovieListItemModel] = Array()
+    
 }
 
 struct MovieListItemModel: Codable {
@@ -26,4 +27,3 @@ struct MovieListItemModel: Codable {
     let nameRu: String?
     let posterUrl: String?
 }
-
