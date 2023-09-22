@@ -7,6 +7,16 @@
 
 import UIKit
 class MovieDetailsViewController: UIViewController{
+    // MARK: - Constants
+    private let movieId: Int
+    
+    private let networkManager: NetworkManagerProtocol
+    
+    // MARK: - Private Properties
+    
+    private lazy var scrollView: UIScrollView = {
+        UIScrollView()
+    }()
     
     private lazy var errorImage: UIImage = {
         UIImage().withTintColor(.systemGray6, renderingMode: .alwaysOriginal)
@@ -16,7 +26,6 @@ class MovieDetailsViewController: UIViewController{
         let image = UIImageView()
         image.contentMode = .scaleAspectFit
         image.clipsToBounds = true
-//        image.backgroundColor = .systemGray5
         return image
     }()
     private lazy var kinopoiskLabel: UILabel = {
@@ -54,6 +63,7 @@ class MovieDetailsViewController: UIViewController{
         label.textColor = .black
         label.font = .systemFont(ofSize: 24, weight: .bold)
         label.textAlignment = .center
+        label.numberOfLines = 0
         return label
     }()
     private lazy var originalNameLabel: UILabel = {
@@ -61,6 +71,7 @@ class MovieDetailsViewController: UIViewController{
         label.textColor = .lightGray
         label.font = .systemFont(ofSize: 16)
         label.textAlignment = .center
+        label.numberOfLines = 0
         return label
     }()
     private lazy var descriptionLabel: UILabel = {
@@ -97,21 +108,16 @@ class MovieDetailsViewController: UIViewController{
         return label
     }()
     private lazy var loadContentIndicator: UIActivityIndicatorView = {
-        let view = UIActivityIndicatorView(frame: CGRect(x: 220, y: 220, width: 50, height: 50))
+        let view = UIActivityIndicatorView(style: UIActivityIndicatorView.Style.large)
         return view
     }()
     
     private lazy var loadImageIndicator: UIActivityIndicatorView = {
-        let view = UIActivityIndicatorView(frame: CGRect(x: 220, y: 220, width: 50, height: 50))
+        let view = UIActivityIndicatorView(style: UIActivityIndicatorView.Style.large)
         return view
     }()
     
-    private var movieId: Int
-
-    private var viewModel: MovieViewModel? = nil
-    
-    private let networkManager: NetworkManagerProtocol
-
+    // MARK: - Initializers
     init(_ movieId: Int, networkManager: NetworkManagerProtocol = NetworkManager()) {
         self.networkManager = networkManager
         self.movieId = movieId
@@ -121,16 +127,12 @@ class MovieDetailsViewController: UIViewController{
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
+    
+    // MARK: - Private Methods
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
-        view.addSubview(loadContentIndicator)
-        loadContentIndicator.startAnimating()
-        loadContentIndicator.snp.makeConstraints { make in
-            make.centerY.equalTo(view.snp.centerY)
-            make.centerX.equalTo(view.snp.centerX)
-        }
+        setupLoadContentIndicator()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -138,10 +140,25 @@ class MovieDetailsViewController: UIViewController{
         loadData()
     }
     
+    func setupLoadContentIndicator() {
+        view.addSubview(scrollView)
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
+        scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        
+//        scrollView.addSubview(loadContentIndicator)
+//        loadContentIndicator.startAnimating()
+//        loadContentIndicator.translatesAutoresizingMaskIntoConstraints = false
+//
+//        loadImageIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+//        loadImageIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
+    }
+    
     private func dataDidLoad(_ data: MovieViewModel?) -> Void {
 
-            if let vm = data{
-                viewModel = vm
+        if let vm = data {
                 
                 loadContentIndicator.stopAnimating()
                 loadContentIndicator.isHidden = true
@@ -153,7 +170,7 @@ class MovieDetailsViewController: UIViewController{
                 kinopoiskRatingLabel.text = "\(vm.ratingKinopoisk ?? 0.0)"
                 ruNameLabel.text = vm.nameRu
                 originalNameLabel.text = vm.nameOriginal
-                descriptionLabel.text = vm.description
+                descriptionLabel.text = vm.description ?? ""
                 yearValueLabel.text = "\(vm.year ?? 0)"
                 filmLengthValueLabel.text = "\(vm.filmLength ?? 0) мин."
                 
@@ -182,124 +199,106 @@ class MovieDetailsViewController: UIViewController{
         }
 
     
-    func loadData(){
+    private func loadData(){
         networkManager.getMovie(by: movieId, completion: dataDidLoad)
     }
     
-    func setupView(){
-        configureView(viewModel!)
-        view.addSubview(previewImage)
-        view.addSubview(previewImage)
-        view.addSubview(kinopoiskLabel)
-        view.addSubview(kinopoiskRatingLabel)
-        view.addSubview(imdbLabel)
-        view.addSubview(imdbRatingLabel)
-        view.addSubview(ruNameLabel)
-        view.addSubview(originalNameLabel)
-        view.addSubview(descriptionLabel)
-        view.addSubview(yearLabel)
-        view.addSubview(yearValueLabel)
-        view.addSubview(filmLengthLabel)
-        view.addSubview(filmLengthValueLabel)
-        view.addSubview(loadImageIndicator)
+    private func setupView(){
+        scrollView.addSubview(previewImage)
+        scrollView.addSubview(previewImage)
+        scrollView.addSubview(kinopoiskLabel)
+        scrollView.addSubview(kinopoiskRatingLabel)
+        scrollView.addSubview(imdbLabel)
+        scrollView.addSubview(imdbRatingLabel)
+        scrollView.addSubview(ruNameLabel)
+        scrollView.addSubview(originalNameLabel)
+        scrollView.addSubview(descriptionLabel)
+        scrollView.addSubview(yearLabel)
+        scrollView.addSubview(yearValueLabel)
+        scrollView.addSubview(filmLengthLabel)
+        scrollView.addSubview(filmLengthValueLabel)
+        scrollView.addSubview(loadImageIndicator)
         loadImageIndicator.startAnimating()
     }
-    func setupConstraits(){
-
-        previewImage.snp.makeConstraints { make in
-            make.left.equalTo(view.snp.left).inset(16)
-            make.top.equalTo(view.safeAreaLayoutGuide.snp.top).inset(20)
-            make.width.equalTo(187.5)
-            make.height.equalTo(250)
-        }
-        
-        loadImageIndicator.snp.makeConstraints { make in
-            make.centerY.equalTo(previewImage.snp.centerY)
-            make.centerX.equalTo(previewImage.snp.centerX)
-        }
-
-        kinopoiskLabel.snp.makeConstraints { make in
-            make.top.equalTo(view.safeAreaLayoutGuide.snp.topMargin).inset(10)
-            make.left.equalTo(previewImage.snp.right).offset(16)
-            make.right.equalTo(view.safeAreaLayoutGuide.snp.rightMargin).inset(16)
-        }
-
-        kinopoiskRatingLabel.snp.makeConstraints { make in
-            make.top.equalTo(kinopoiskLabel.snp.bottom).offset(16)
-            make.left.equalTo(previewImage.snp.right).offset(16)
-            make.right.equalTo(view.safeAreaLayoutGuide.snp.rightMargin).inset(16)
-        }
-
-        imdbLabel.snp.makeConstraints { make in
-            make.top.equalTo(kinopoiskRatingLabel.snp.bottom).offset(16)
-            make.left.equalTo(previewImage.snp.right).offset(16)
-            make.right.equalTo(view.safeAreaLayoutGuide.snp.rightMargin).inset(16)
-        }
-
-        imdbRatingLabel.snp.makeConstraints { make in
-            make.top.equalTo(imdbLabel.snp.bottom).offset(16)
-            make.left.equalTo(previewImage.snp.right).offset(16)
-            make.right.equalTo(view.safeAreaLayoutGuide.snp.rightMargin).inset(16)
-        }
-
-        ruNameLabel.snp.makeConstraints { make in
-            make.top.equalTo(previewImage.snp.bottom).offset(30)
-            make.right.equalTo(view.safeAreaLayoutGuide.snp.rightMargin).inset(16)
-            make.left.equalTo(view.safeAreaLayoutGuide.snp.leftMargin).inset(16)
-        }
-
-        originalNameLabel.snp.makeConstraints { make in
-            make.top.equalTo(ruNameLabel.snp.bottom).offset(20)
-            make.right.equalTo(view.safeAreaLayoutGuide.snp.rightMargin).inset(16)
-            make.left.equalTo(view.safeAreaLayoutGuide.snp.leftMargin).inset(16)
-        }
-
-        descriptionLabel.snp.makeConstraints { make in
-            make.top.equalTo(originalNameLabel.snp.bottom).offset(30)
-            make.right.equalTo(view.safeAreaLayoutGuide.snp.rightMargin).inset(16)
-            make.left.equalTo(view.safeAreaLayoutGuide.snp.leftMargin).inset(16)
-        }
-
-        yearLabel.snp.makeConstraints { make in
-            make.top.equalTo(descriptionLabel.snp.bottom).offset(30)
-            make.right.equalTo(view.safeAreaLayoutGuide.snp.rightMargin).inset(16)
-            make.left.equalTo(view.safeAreaLayoutGuide.snp.leftMargin).inset(16)
-        }
-
-        yearValueLabel.snp.makeConstraints { make in
-            make.top.equalTo(yearLabel.snp.bottom).offset(10)
-            make.right.equalTo(view.safeAreaLayoutGuide.snp.rightMargin).inset(16)
-            make.left.equalTo(view.safeAreaLayoutGuide.snp.leftMargin).inset(16)
-        }
-
-        filmLengthLabel.snp.makeConstraints { make in
-            make.top.equalTo(yearValueLabel.snp.bottom).offset(20)
-            make.right.equalTo(view.safeAreaLayoutGuide.snp.rightMargin).inset(16)
-            make.left.equalTo(view.safeAreaLayoutGuide.snp.leftMargin).inset(16)
-        }
-
-        filmLengthValueLabel.snp.makeConstraints { make in
-            make.top.equalTo(filmLengthLabel.snp.bottom).offset(10)
-            make.right.equalTo(view.safeAreaLayoutGuide.snp.rightMargin).inset(16)
-            make.left.equalTo(view.safeAreaLayoutGuide.snp.leftMargin).inset(16)
-        }
-    }
     
-    func configureView(_ vm: MovieViewModel){
-       
-        let queue = DispatchQueue.global(qos: .userInitiated)
+    private func setupConstraits(){
         
-        queue.async {[weak self] in
-            guard let self = self else {return}
-            
-        }
-        
-
-    }
+        previewImage.translatesAutoresizingMaskIntoConstraints = false
+        previewImage.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: 20).isActive = true
+        previewImage.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20).isActive = true
+        previewImage.widthAnchor.constraint(equalToConstant: 187.5).isActive = true
+        previewImage.heightAnchor.constraint(equalToConstant: 250).isActive = true
     
-    func setMovieId(_ id: Int){
-        movieId = id
+        
+        loadImageIndicator.translatesAutoresizingMaskIntoConstraints = false
+        loadImageIndicator.centerXAnchor.constraint(equalTo: previewImage.centerXAnchor).isActive = true
+        loadImageIndicator.centerYAnchor.constraint(equalTo: previewImage.centerYAnchor).isActive = true
+        
+        kinopoiskLabel.translatesAutoresizingMaskIntoConstraints = false
+        kinopoiskLabel.topAnchor.constraint(equalTo: previewImage.topAnchor, constant: 10).isActive = true
+        kinopoiskLabel.leftAnchor.constraint(equalTo: previewImage.rightAnchor, constant: 16).isActive = true
+        kinopoiskLabel.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -16).isActive = true
+
+        kinopoiskRatingLabel.translatesAutoresizingMaskIntoConstraints = false
+        kinopoiskRatingLabel.topAnchor.constraint(equalTo: kinopoiskLabel.bottomAnchor, constant: 10).isActive = true
+        kinopoiskRatingLabel.leftAnchor.constraint(equalTo: previewImage.rightAnchor, constant: 16).isActive = true
+        kinopoiskRatingLabel.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -16).isActive = true
+        
+        imdbLabel.translatesAutoresizingMaskIntoConstraints = false
+        imdbLabel.topAnchor.constraint(equalTo: kinopoiskRatingLabel.bottomAnchor, constant: 10).isActive = true
+        imdbLabel.leftAnchor.constraint(equalTo: previewImage.rightAnchor, constant: 16).isActive = true
+        imdbLabel.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -16).isActive = true
+        
+        imdbRatingLabel.translatesAutoresizingMaskIntoConstraints = false
+        imdbRatingLabel.topAnchor.constraint(equalTo: imdbLabel.bottomAnchor, constant: 10).isActive = true
+        imdbRatingLabel.leftAnchor.constraint(equalTo: previewImage.rightAnchor, constant: 16).isActive = true
+        imdbRatingLabel.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -16).isActive = true
+
+        ruNameLabel.translatesAutoresizingMaskIntoConstraints = false
+        ruNameLabel.topAnchor.constraint(equalTo: previewImage.bottomAnchor, constant: 20).isActive = true
+        ruNameLabel.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 16).isActive = true
+        ruNameLabel.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -16).isActive = true
+        
+        originalNameLabel.translatesAutoresizingMaskIntoConstraints = false
+        originalNameLabel.topAnchor.constraint(equalTo: ruNameLabel.bottomAnchor, constant: 10).isActive = true
+        originalNameLabel.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 16).isActive = true
+        originalNameLabel.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -16).isActive = true
+
+        descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
+        descriptionLabel.topAnchor.constraint(equalTo: originalNameLabel.bottomAnchor, constant: 20).isActive = true
+        descriptionLabel.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 16).isActive = true
+        descriptionLabel.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -16).isActive = true
+        
+        yearLabel.translatesAutoresizingMaskIntoConstraints = false
+        yearLabel.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: 20).isActive = true
+        yearLabel.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 16).isActive = true
+        yearLabel.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -16).isActive = true
+
+        yearValueLabel.translatesAutoresizingMaskIntoConstraints = false
+        yearValueLabel.topAnchor.constraint(equalTo: yearLabel.bottomAnchor, constant: 10).isActive = true
+        yearValueLabel.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 16).isActive = true
+        yearValueLabel.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -16).isActive = true
+        
+        filmLengthLabel.translatesAutoresizingMaskIntoConstraints = false
+        filmLengthLabel.topAnchor.constraint(equalTo: yearValueLabel.bottomAnchor, constant: 20).isActive = true
+        filmLengthLabel.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 16).isActive = true
+        filmLengthLabel.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -16).isActive = true
+
+        filmLengthValueLabel.translatesAutoresizingMaskIntoConstraints = false
+        filmLengthValueLabel.topAnchor.constraint(equalTo: filmLengthLabel.bottomAnchor, constant: 10).isActive = true
+        filmLengthValueLabel.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 16).isActive = true
+        filmLengthValueLabel.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -16).isActive = true
+        filmLengthValueLabel.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor, constant: -16).isActive = true
     }
 }
 
-var faceViewModel = MovieViewModel(kinopoiskId: 123, nameRu: "Ровер", nameOriginal: "The Rover", posterUrl: "https://kinopoiskapiunofficial.tech/images/posters/kp/677780.jpg", ratingKinopoisk: 6.2, ratingImdb: 6.2, year: 2012, filmLength: 114, description: "Через 10 лет после глобального экономического коллапса закаленный герой-одиночка преследует банду, угнавшую его автомобиль.")
+//var faceViewModel = MovieViewModel(
+//    kinopoiskId: 123,
+//    nameRu: "Ровер",
+//    nameOriginal: "The Rover",
+//    posterUrl: "https://kinopoiskapiunofficial.tech/images/posters/kp/677780.jpg",
+//    ratingKinopoisk: 6.2,
+//    ratingImdb: 6.2,
+//    year: 2012,
+//    filmLength: 114,
+//    description: "Через 10 лет после глобального экономического коллапса закаленный герой-одиночка преследует банду, угнавшую его автомобиль.")
