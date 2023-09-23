@@ -6,15 +6,15 @@
 //
 
 import UIKit
-import SnapKit
 
-class MovieCell: UITableViewCell {
-    
+final class MovieCell: UITableViewCell {
+    // MARK: - Types
     struct ViewModel {
         let movieTitle: String
         let moviePoster: UIImage?
     }
     
+    // MARK: - Private Properties
     private lazy var errorImage: UIImage = {
         UIImage()
     }()
@@ -29,6 +29,7 @@ class MovieCell: UITableViewCell {
         label.textColor = .black
         label.font = .systemFont(ofSize: 14)
         label.textAlignment = .left
+        label.numberOfLines = 3
         return label
     }()
     
@@ -39,51 +40,25 @@ class MovieCell: UITableViewCell {
         return image
     }()
     
-    
+    // MARK: - Initializers
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-
-        contentView.addSubview(posterView)
-        contentView.addSubview(activityIndicator)
-        contentView.addSubview(label)
-        activityIndicator.isHidden = true
-        
+        setupView()
         setupConstraints()
-        
-        
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: - Public Methods
+    
     override func prepareForReuse() {
         super.prepareForReuse()
         posterView.image = errorImage
         label.text = nil
     }
-    
-//    func configure(_ vm: MovieListItemModel) {
-//        let queue = DispatchQueue.global(qos: .userInitiated)
-//
-//        queue.async {[weak self] in
-//            guard let self = self else {return}
-//            if let urlString = vm.posterUrl {
-//                self.service.loadImage(urlString: urlString) { image in
-//                    DispatchQueue.main.async {
-//                        self.posterView.image = image ?? self.errorImage
-//                        self.activityIndicator.stopAnimating()
-//                        self.activityIndicator.isHidden = true
-//                    }
-//                }
-//            }
-//        }
-//
-//
-//        //image.image = UIImage(systemName: "folder") ?? UIImage()
-//        label.text = vm.nameRu
-//    }
-    
+
     func configure(_ model: ViewModel) {
         if let image = model.moviePoster {
             posterView.image = image
@@ -101,25 +76,31 @@ class MovieCell: UITableViewCell {
         posterView.image = image
     }
     
+    // MARK: - Private Methods
+    private func setupView(){
+        contentView.addSubview(posterView)
+        contentView.addSubview(activityIndicator)
+        contentView.addSubview(label)
+        activityIndicator.isHidden = true
+    }
+    
     private func setupConstraints() {
-        activityIndicator.snp.makeConstraints { make in
-            make.centerX.equalTo(posterView.snp.centerX)
-            make.centerY.equalTo(posterView.snp.centerY)
-        }
-        posterView.snp.makeConstraints { make in
-            make.height.equalTo(100)
-            make.width.equalTo(75)
-            make.leading.equalTo(contentView.snp.leading).inset(16)
-            make.top.equalTo(contentView.snp.top).inset(16)
-            make.bottom.equalTo(contentView.snp.bottom).inset(16)
-            //make.bottom.equalTo(contentView.snp.bottom).inset(16)
-        }
-        label.snp.makeConstraints(){
-            make in
-            make.centerY.equalTo(posterView.snp.centerY)
-            make.left.equalTo(posterView.snp.right).offset(16)
-            make.trailing.equalTo(contentView.snp.trailing).inset(16)
-        }
+        posterView.translatesAutoresizingMaskIntoConstraints = false
+        posterView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 16).isActive = true
+        posterView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16).isActive = true
+        posterView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -16).isActive = true
+        posterView.widthAnchor.constraint(equalToConstant: 75).isActive = true
+        posterView.heightAnchor.constraint(equalToConstant: 100).isActive = true
+        
+        activityIndicator.translatesAutoresizingMaskIntoConstraints = false
+        activityIndicator.centerXAnchor.constraint(equalTo: posterView.centerXAnchor).isActive = true
+        activityIndicator.centerYAnchor.constraint(equalTo: posterView.centerYAnchor).isActive = true
+        
+        
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.centerYAnchor.constraint(equalTo: contentView.centerYAnchor).isActive = true
+        label.leadingAnchor.constraint(equalTo: posterView.trailingAnchor, constant: 16).isActive = true
+        label.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16).isActive = true
     }
 }
 

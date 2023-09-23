@@ -6,7 +6,8 @@
 //
 
 import UIKit
-class MovieDetailsViewController: UIViewController{
+
+final class MovieDetailsViewController: UIViewController{
     // MARK: - Constants
     private let movieId: Int
     
@@ -189,12 +190,9 @@ class MovieDetailsViewController: UIViewController{
                 let errorImageView = UIImageView()
                 errorImageView.image = self.errorImage
                 self.view.addSubview(errorImageView)
-                errorImageView.snp.makeConstraints { make in
-                    make.height.equalTo(250)
-                    make.width.equalTo(250)
-                    make.centerY.equalTo(self.view.snp.centerY)
-                    make.centerX.equalTo(self.view.snp.centerX)
-                }
+                errorImageView.translatesAutoresizingMaskIntoConstraints = false
+                errorImageView.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
+                errorImageView.centerYAnchor.constraint(equalTo: self.view.centerYAnchor).isActive = true
             }
         }
 

@@ -4,16 +4,10 @@
 //
 //  Created by Ибрахим on 12.09.2023.
 //
-// TODO: - Навести порядок. Методы и параметры должны идти в определенном порядке.
-
 
 import UIKit
-import SnapKit
-import Alamofire
 
-
-
-class MoviesListController: UIViewController {
+final class MoviesListController: UIViewController {
     // MARK: - Types
     struct MovieListItem {
         let kinopoiskId: Int
@@ -24,10 +18,7 @@ class MoviesListController: UIViewController {
     }
     // MARK: - Constants
     private let cellId = "movieTableItem"
-
-    // MARK: - Public Properties
-
-    // MARK: - IBOutlet
+    private let networkManager: NetworkManagerProtocol
 
     // MARK: - Private Properties
     
@@ -72,11 +63,11 @@ class MoviesListController: UIViewController {
         let header = UITableViewHeaderFooterView()
         header.contentView.addSubview(tableHeaderLabel)
         header.backgroundColor = .white
-        tableHeaderLabel.snp.makeConstraints { make in
-            make.bottom.equalTo(header.snp.bottom).inset(10)
-            make.right.equalTo(header.snp.right).inset(10)
-            make.left.equalTo(header.snp.left).inset(10)
-        }
+        tableHeaderLabel.translatesAutoresizingMaskIntoConstraints = false
+        tableHeaderLabel.bottomAnchor.constraint(equalTo: header.bottomAnchor, constant: -10).isActive = true
+        tableHeaderLabel.trailingAnchor.constraint(equalTo: header.trailingAnchor, constant:  -10).isActive = true
+        tableHeaderLabel.leadingAnchor.constraint(equalTo: header.leadingAnchor, constant: 10).isActive = true
+
         view.tableHeaderView = header
         return view
     }()
@@ -87,7 +78,6 @@ class MoviesListController: UIViewController {
         return view
     }()
     
-    private var networkManager: NetworkManagerProtocol
     private var data = [MovieListItem]()
 
     // MARK: - Initializers
@@ -101,10 +91,6 @@ class MoviesListController: UIViewController {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
-    // MARK: - UIViewController(*)
-
-    // MARK: - Public Methods
 
     // MARK: - IBAction
     
@@ -152,55 +138,39 @@ class MoviesListController: UIViewController {
     }
 
 
-    func setupView(){
+    private func setupView(){
         view.addSubview(textField)
         view.addSubview(searchButton)
         view.addSubview(getPopularButton)
         view.addSubview(tableView)
         view.addSubview(activityIndicator)
         activityIndicator.startAnimating()
-        
-//        DispatchQueue.global(qos: .userInitiated).async {
-//            [weak self] in
-//            guard let self = self else { return }
-//            self.service.getTopMovies(self.setStore)
-//        }
     }
-    func setupConstraints(){
-        textField.snp.makeConstraints { make in
-            make.top.equalTo(view.safeAreaLayoutGuide.snp.topMargin).inset(40)
-            make.left.equalTo(view.safeAreaLayoutGuide.snp.leftMargin).inset(16)
-            make.right.equalTo(view.safeAreaLayoutGuide.snp.rightMargin).inset(16)
-        }
-        searchButton.snp.makeConstraints { make in
-            make.top.equalTo(textField.snp.bottom).offset(20.0)
-            make.centerX.equalTo(view.safeAreaLayoutGuide.snp.centerX)
-        }
-        getPopularButton.snp.makeConstraints { make in
-            make.top.equalTo(searchButton.snp.bottom).offset(20.0)
-            make.centerX.equalTo(view.safeAreaLayoutGuide.snp.centerX)
-        }
-        
+    private func setupConstraints(){
 
-        tableView.snp.makeConstraints { make in
-            make.top.equalTo(getPopularButton.snp.bottom).offset(40)
-            make.left.equalTo(view.safeAreaLayoutGuide.snp.leftMargin).inset(16)
-            make.right.equalTo(view.safeAreaLayoutGuide.snp.rightMargin).inset(16)
-            make.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottomMargin).inset(40)
-        }
-        activityIndicator.snp.makeConstraints { make in
-            make.centerX.equalTo(tableView.snp.centerX)
-            make.centerY.equalTo(tableView.snp.centerY)
-        }
+        textField.translatesAutoresizingMaskIntoConstraints = false
+        textField.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16).isActive = true
+        textField.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 40).isActive = true
+        textField.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16).isActive = true
+        
+        searchButton.translatesAutoresizingMaskIntoConstraints = false
+        searchButton.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        searchButton.topAnchor.constraint(equalTo: textField.bottomAnchor, constant: 16).isActive = true
+        
+        getPopularButton.translatesAutoresizingMaskIntoConstraints = false
+        getPopularButton.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        getPopularButton.topAnchor.constraint(equalTo: searchButton.bottomAnchor, constant: 16).isActive = true
+        
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        tableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor).isActive = true
+        tableView.topAnchor.constraint(equalTo: getPopularButton.bottomAnchor, constant: 40).isActive = true
+        tableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor).isActive = true
+        tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16).isActive = true
+
+        activityIndicator.translatesAutoresizingMaskIntoConstraints = false
+        activityIndicator.centerXAnchor.constraint(equalTo: tableView.centerXAnchor).isActive = true
+        activityIndicator.centerYAnchor.constraint(equalTo: tableView.centerYAnchor).isActive = true
     }
-    
-    var movieStore: MoviesListViewModel = MoviesListViewModel(films: [
-//        MovieListItemModel(filmId: 677780, nameRu: "alsdkfjaskdlf", posterUrl: "https://kinopoiskapiunofficial.tech/images/posters/kp_small/677780.jpg"),
-//        MovieListItemModel(filmId: 677780, nameRu: "alsdkfjaskdlf", posterUrl: "https://kinopoiskapiunofficial.tech/images/posters/kp_small/677780.jpg"),
-//        MovieListItemModel(filmId: 677780, nameRu: "alsdkfjaskdlf", posterUrl: "https://kinopoiskapiunofficial.tech/images/posters/kp_small/677780.jpg"),
-//        MovieListItemModel(filmId: 677780, nameRu: "alsdkfjaskdlf", posterUrl: "https://kinopoiskapiunofficial.tech/images/posters/kp_small/677780.jpg"),
-//        MovieListItemModel(filmId: 677780, nameRu: "alsdkfjaskdlf", posterUrl: "https://kinopoiskapiunofficial.tech/images/posters/kp_small/677780.jpg")
-    ])
     
     private func dataDidLoad(_ data: MoviesListViewModel?){
         if let listMovies = data {
@@ -236,8 +206,6 @@ extension MoviesListController: UITableViewDataSource {
                 self.data[indexPath.row].image = image
                 cell.posterDidLoad(image: image)
             }
-            // TODO: - Метод в ячейке который после загрузки обновит иконку.
-//            cell.updatePoster(image)
         }
         let viewModel = convertMovieListItemToMovieCellViewModel(data[indexPath.row])
         cell.configure(viewModel)

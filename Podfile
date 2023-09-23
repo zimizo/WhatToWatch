@@ -7,8 +7,6 @@ target 'WhatToWatch' do
 
   pod 'Alamofire'
 
-  pod 'SnapKit', '~> 5.6.0'
-
   target 'WhatToWatchTests' do
     inherit! :search_paths
     # Pods for testing
