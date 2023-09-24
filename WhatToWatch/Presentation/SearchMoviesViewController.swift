@@ -8,7 +8,7 @@
 import UIKit
 
 /// Контроллер для отображения списка топ 100 фильмов.
-final class MoviesListController: UIViewController {
+final class SearchMoviesViewController: UIViewController {
     // MARK: - Types
     struct MovieListItem {
         let kinopoiskId: Int
@@ -174,7 +174,7 @@ final class MoviesListController: UIViewController {
     }
 }
 
-extension MoviesListController: UITableViewDataSource {
+extension SearchMoviesViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         data.count
     }
@@ -215,7 +215,7 @@ extension MoviesListController: UITableViewDataSource {
     }
 }
 
-extension MoviesListController: UITableViewDelegate {
+extension SearchMoviesViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let viewModel = data[indexPath.row]
         let detailsView = MovieDetailsViewController(viewModel.kinopoiskId)

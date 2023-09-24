@@ -97,7 +97,6 @@ final class MovieCell: UITableViewCell {
             posterImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             posterImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -16),
             
-
             activityIndicator.centerXAnchor.constraint(equalTo: posterImageView.centerXAnchor),
             activityIndicator.centerYAnchor.constraint(equalTo: posterImageView.centerYAnchor),
 

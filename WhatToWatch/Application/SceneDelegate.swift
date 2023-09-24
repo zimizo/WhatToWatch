@@ -23,10 +23,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         let window = UIWindow(windowScene: windowScene)
         
-        let viewController = MoviesListController()
-        let navigation = UINavigationController(rootViewController: viewController)
-        
-        window.rootViewController = navigation
+        window.rootViewController = TabViewController()
 
         self.window = window
         window.makeKeyAndVisible()
