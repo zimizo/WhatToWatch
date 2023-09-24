@@ -2,19 +2,17 @@
 //  CoreDataManager.swift
 //  WhatToWatch
 //
-//  Created by Иван Изюмкин on 23.09.2023.
+//  Created by Ибрахим on 23.09.2023.
 //
 
-import Foundation
 import CoreData
+import Foundation
 
 protocol CoreDataManager {
     func saveContext()
 }
 
 final class DefaultCoreDataManager: CoreDataManager {
-    
-
     // MARK: - Core Data stack
 
     lazy var persistentContainer: NSPersistentCloudKitContainer = {
@@ -25,7 +23,7 @@ final class DefaultCoreDataManager: CoreDataManager {
          error conditions that could cause the creation of the store to fail.
         */
         let container = NSPersistentCloudKitContainer(name: "WhatToWatch")
-        container.loadPersistentStores(completionHandler: { (storeDescription, error) in
+        container.loadPersistentStores(completionHandler: { storeDescription, error in
             if let error = error as NSError? {
                 // Replace this implementation with code to handle the error appropriately.
                 // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
@@ -38,7 +36,7 @@ final class DefaultCoreDataManager: CoreDataManager {
                  * The store could not be migrated to the current model version.
                  Check the error message to determine what the actual problem was.
                  */
-                fatalError("Unresolved error \(error), \(error.userInfo)")
+                fatalError("Unresolved error \(error), \(error.userInfo), Store description: \(storeDescription)")
             }
         })
         return container

@@ -5,8 +5,8 @@
 //  Created by Ибрахим on 12.09.2023.
 //
 
-import XCTest
 @testable import WhatToWatch
+import XCTest
 
 final class WhatToWatchTests: XCTestCase {
 

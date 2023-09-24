@@ -33,7 +33,11 @@ final class MoviesListController: UIViewController {
         var view = UIButton(configuration: .filled())
         view.translatesAutoresizingMaskIntoConstraints = false
         view.setTitle("Поиск", for: .normal)
-        view.addTarget(self, action:#selector(self.onSearchButtonClick), for: .touchUpInside)
+        view.addTarget(
+            self,
+            action: #selector(self.onSearchButtonClick),
+            for: .touchUpInside
+        )
         return view
     }()
     
@@ -41,7 +45,11 @@ final class MoviesListController: UIViewController {
         var view = UIButton(configuration: .filled())
         view.translatesAutoresizingMaskIntoConstraints = false
         view.setTitle("Популярные фильмы", for: .normal)
-        view.addTarget(self, action:#selector(self.onGetPopularButtonClick), for: .touchUpInside)
+        view.addTarget(
+            self,
+            action: #selector(self.onGetPopularButtonClick),
+            for: .touchUpInside
+        )
         return view
     }()
     

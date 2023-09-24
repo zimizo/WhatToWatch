@@ -1,8 +1,8 @@
 //
 //  NetworkManager.swift
-//  m19
+//  WhatToWatch
 //
-//  Created by Иван Изюмкин on 11.09.2023.
+//  Created by Ибрахим on 11.09.2023.
 //
 
 import Alamofire
@@ -28,8 +28,8 @@ final class NetworkManager: NetworkManagerProtocol {
     // MARK: - Public Methods
     
     func getImage(for url: String, completion: @escaping (UIImage?) -> Void) {
-        loadData(url: url, parameters: nil, headers: nil){
-            data in guard let imageData = data else {
+        loadData(url: url, parameters: nil, headers: nil) { data in
+            guard let imageData = data else {
                 print("NetworkManager.getImage: Данные не обнаружены.")
                 completion(nil)
                 return
@@ -51,20 +51,20 @@ final class NetworkManager: NetworkManagerProtocol {
         loadData(
             url: url,
             parameters: ["keyword": request, "page": 1],
-            headers: ["X-API-KEY": Constants.apiKey]){
-                responseData in guard let data = responseData else {
-                    print("NetworkManager.getMovies: Данные не обнаружены.")
-                    completion(nil)
-                    return
-                }
-                
-                do {
-                    try completion(JSONDecoder().decode(MoviesListViewModel.self, from: data))
-                } catch {
-                    print("NetworkManager.getMovies: Не получилось конвертировать данные в модель.")
-                    completion(nil)
-                }
+            headers: ["X-API-KEY": Constants.apiKey]) { responseData in
+            guard let data = responseData else {
+                print("NetworkManager.getMovies: Данные не обнаружены.")
+                completion(nil)
+                return
             }
+            
+            do {
+                try completion(JSONDecoder().decode(MoviesListViewModel.self, from: data))
+            } catch {
+                print("NetworkManager.getMovies: Не получилось конвертировать данные в модель.")
+                completion(nil)
+            }
+        }
     }
     
     func getTop100Movies(completion: @escaping (MoviesListViewModel?) -> Void) {
@@ -72,19 +72,21 @@ final class NetworkManager: NetworkManagerProtocol {
         loadData(
             url: url,
             parameters: ["type": "TOP_100_POPULAR_FILMS"],
-            headers: ["X-API-KEY": Constants.apiKey]){
-                responseData in guard let data = responseData else {
-                    print("NetworkManager.getTop100Movies: Данные не обнаружены.")
-                    completion(nil)
-                    return
-                }
-                do {
-                    try completion(JSONDecoder().decode(MoviesListViewModel.self, from: data))
-                } catch {
-                    print("NetworkManager.getTop100Movies: Не получилось конвертировать данные в модель.")
-                    completion(nil)
-                }
+            headers: ["X-API-KEY": Constants.apiKey]) { responseData in
+                
+            guard let data = responseData else {
+                print("NetworkManager.getTop100Movies: Данные не обнаружены.")
+                completion(nil)
+                return
             }
+                
+            do {
+                try completion(JSONDecoder().decode(MoviesListViewModel.self, from: data))
+            } catch {
+                print("NetworkManager.getTop100Movies: Не получилось конвертировать данные в модель.")
+                completion(nil)
+            }
+        }
     }
     
     func getMovie(by movieId: Int, completion: @escaping (MovieViewModel?) -> Void) {
@@ -92,9 +94,8 @@ final class NetworkManager: NetworkManagerProtocol {
         loadData(
             url: url,
             parameters: nil,
-            headers: ["X-API-KEY": Constants.apiKey]
-        ){
-            responseData in guard let data = responseData else {
+            headers: ["X-API-KEY": Constants.apiKey]) { responseData in
+            guard let data = responseData else {
                 print("NetworkManager.getMovie: Данные не обнаружены.")
                 completion(nil)
                 return

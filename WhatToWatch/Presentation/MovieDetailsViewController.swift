@@ -161,7 +161,7 @@ final class MovieDetailsViewController: UIViewController {
     }
     
     /// Обновляет UI после получения данных с сервера.
-    private func dataDidLoad(_ data: MovieViewModel?) -> Void {
+    private func dataDidLoad(_ data: MovieViewModel?) {
         if let viewModel = data {
             loadContentIndicator.stopAnimating()
             loadContentIndicator.isHidden = true
@@ -197,13 +197,12 @@ final class MovieDetailsViewController: UIViewController {
         }
     }
     
-    
     /// Загружает данные о текущем фильме.
-    private func loadData(){
+    private func loadData() {
         networkManager.getMovie(by: movieId, completion: dataDidLoad)
     }
     
-    private func setupView(){
+    private func setupView() {
         scrollView.addSubview(previewImage)
         scrollView.addSubview(previewImage)
         scrollView.addSubview(kinopoiskLabel)
@@ -221,15 +220,13 @@ final class MovieDetailsViewController: UIViewController {
         loadImageIndicator.startAnimating()
     }
     
-    private func setupConstraits(){
-        
+    private func setupConstraits() {
         previewImage.translatesAutoresizingMaskIntoConstraints = false
         previewImage.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: 20).isActive = true
         previewImage.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20).isActive = true
         previewImage.widthAnchor.constraint(equalToConstant: 187.5).isActive = true
         previewImage.heightAnchor.constraint(equalToConstant: 250).isActive = true
     
-        
         loadImageIndicator.translatesAutoresizingMaskIntoConstraints = false
         loadImageIndicator.centerXAnchor.constraint(equalTo: previewImage.centerXAnchor).isActive = true
         loadImageIndicator.centerYAnchor.constraint(equalTo: previewImage.centerYAnchor).isActive = true
@@ -289,11 +286,5 @@ final class MovieDetailsViewController: UIViewController {
         filmLengthValueLabel.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 16).isActive = true
         filmLengthValueLabel.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -16).isActive = true
         filmLengthValueLabel.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor, constant: -16).isActive = true
-        
-        
-        
-        
-        
-        
     }
 }
