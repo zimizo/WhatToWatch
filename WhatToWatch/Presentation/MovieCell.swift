@@ -23,6 +23,7 @@ final class MovieCell: UITableViewCell {
     private lazy var activityIndicator: UIActivityIndicatorView = {
         let view = UIActivityIndicatorView(frame: CGRect(x: 220, y: 220, width: 50, height: 50))
         view.isHidden = true
+        view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
@@ -32,6 +33,7 @@ final class MovieCell: UITableViewCell {
         label.font = .systemFont(ofSize: 14)
         label.textAlignment = .left
         label.numberOfLines = 3
+        label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
@@ -93,16 +95,15 @@ final class MovieCell: UITableViewCell {
 //            posterImageView.heightAnchor.constraint(equalToConstant: 100),
             posterImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 16),
             posterImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            posterImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -16)
+            posterImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -16),
+            
+
+            activityIndicator.centerXAnchor.constraint(equalTo: posterImageView.centerXAnchor),
+            activityIndicator.centerYAnchor.constraint(equalTo: posterImageView.centerYAnchor),
+
+            label.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            label.leadingAnchor.constraint(equalTo: posterImageView.trailingAnchor, constant: 16),
+            label.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16)
         ])
-        
-        activityIndicator.translatesAutoresizingMaskIntoConstraints = false
-        activityIndicator.centerXAnchor.constraint(equalTo: posterImageView.centerXAnchor).isActive = true
-        activityIndicator.centerYAnchor.constraint(equalTo: posterImageView.centerYAnchor).isActive = true
-        
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.centerYAnchor.constraint(equalTo: contentView.centerYAnchor).isActive = true
-        label.leadingAnchor.constraint(equalTo: posterImageView.trailingAnchor, constant: 16).isActive = true
-        label.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16).isActive = true
     }
 }

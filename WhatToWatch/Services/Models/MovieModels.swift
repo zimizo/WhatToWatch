@@ -5,8 +5,7 @@
 //  Created by Ибрахим on 12.09.2023.
 //
 
-// TODO: - Добавить документацию
-/// ?
+/// Модель фильма для экрана details
 struct MovieViewModel: Codable {
     let kinopoiskId: Int
     let nameRu: String?
@@ -19,14 +18,12 @@ struct MovieViewModel: Codable {
     let description: String?
 }
 
-// TODO: - Добавить документацию
-/// ?
+/// Модель списка фильмов для списка
 struct MoviesListViewModel: Codable {
     var films: [MovieListItemModel] = Array()
 }
 
-// TODO: - Добавить документацию
-/// ?
+/// Модель фильма для элемента в списке
 struct MovieListItemModel: Codable {
     let filmId: Int
     let nameRu: String?

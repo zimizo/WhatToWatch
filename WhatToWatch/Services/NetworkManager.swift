@@ -9,14 +9,22 @@ import Alamofire
 import UIKit
 
 protocol NetworkManagerProtocol {
-    /// Что получает? Что запрашивает? И тдЮ
+    /// Запрашивает даные для списка при поиске фильмов по названию
+    /// Передает в замыкание MoviesListViewModel
     func getMovies(for request: String, completion: @escaping (MoviesListViewModel?) -> Void)
+    /// Запрашивает каринку по url
+    /// Передает в замыкание UIImage
     func getImage(for url: String, completion: @escaping (UIImage?) -> Void)
+    /// Запрашивает даные для списка популярных фильмов
+    /// Передает в замыкание MoviesListViewModel
     func getTop100Movies(completion: @escaping (MoviesListViewModel?) -> Void)
+    /// Запрашивает даные фильма по id
+    /// Передает в замыкание MovieViewModel
     func getMovie(by movieId: Int, completion: @escaping (MovieViewModel?) -> Void)
 }
 
-/// Общается с кем? Как? и тд
+/// Запрашивает данные о фильмах с https://kinopoiskapiunofficial.tech
+/// Использует Alamofire
 final class NetworkManager: NetworkManagerProtocol {
     
     // MARK: - Constants
