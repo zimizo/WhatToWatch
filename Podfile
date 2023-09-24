@@ -6,6 +6,7 @@ target 'WhatToWatch' do
   use_frameworks!
 
   pod 'Alamofire'
+  pod 'SwiftLint'
 
   target 'WhatToWatchTests' do
     inherit! :search_paths

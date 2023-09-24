@@ -5,25 +5,29 @@
 //  Created by Иван Изюмкин on 11.09.2023.
 //
 
-import UIKit
 import Alamofire
+import UIKit
 
 protocol NetworkManagerProtocol {
+    /// Что получает? Что запрашивает? И тдЮ
     func getMovies(for request: String, completion: @escaping (MoviesListViewModel?) -> Void)
     func getImage(for url: String, completion: @escaping (UIImage?) -> Void)
     func getTop100Movies(completion: @escaping (MoviesListViewModel?) -> Void)
     func getMovie(by movieId: Int, completion: @escaping (MovieViewModel?) -> Void)
 }
 
+/// Общается с кем? Как? и тд
 final class NetworkManager: NetworkManagerProtocol {
+    
     // MARK: - Constants
     
-    let apiKey = "e49616da-1372-491a-840e-81a87afe3e6e"
+    private enum Constants {
+        static let apiKey = "e49616da-1372-491a-840e-81a87afe3e6e"
+    }
     
     // MARK: - Public Methods
     
     func getImage(for url: String, completion: @escaping (UIImage?) -> Void) {
-        
         loadData(url: url, parameters: nil, headers: nil){
             data in guard let imageData = data else {
                 print("NetworkManager.getImage: Данные не обнаружены.")
@@ -43,10 +47,11 @@ final class NetworkManager: NetworkManagerProtocol {
     
     func getMovies(for request: String, completion: @escaping (MoviesListViewModel?) -> Void) {
         let url = "https://kinopoiskapiunofficial.tech/api/v2.1/films/search-by-keyword"
+        
         loadData(
             url: url,
             parameters: ["keyword": request, "page": 1],
-            headers: ["X-API-KEY": apiKey]){
+            headers: ["X-API-KEY": Constants.apiKey]){
                 responseData in guard let data = responseData else {
                     print("NetworkManager.getMovies: Данные не обнаружены.")
                     completion(nil)
@@ -67,13 +72,12 @@ final class NetworkManager: NetworkManagerProtocol {
         loadData(
             url: url,
             parameters: ["type": "TOP_100_POPULAR_FILMS"],
-            headers: ["X-API-KEY": apiKey]){
+            headers: ["X-API-KEY": Constants.apiKey]){
                 responseData in guard let data = responseData else {
                     print("NetworkManager.getTop100Movies: Данные не обнаружены.")
                     completion(nil)
                     return
                 }
-                //print(String(data: data, encoding: .utf8) ?? "")
                 do {
                     try completion(JSONDecoder().decode(MoviesListViewModel.self, from: data))
                 } catch {
@@ -88,25 +92,31 @@ final class NetworkManager: NetworkManagerProtocol {
         loadData(
             url: url,
             parameters: nil,
-            headers: ["X-API-KEY": apiKey]){
-                responseData in guard let data = responseData else {
-                    print("NetworkManager.getMovie: Данные не обнаружены.")
-                    completion(nil)
-                    return
-                }
-                
-                do {
-                    try completion(JSONDecoder().decode(MovieViewModel.self, from: data))
-                } catch {
-                    print("NetworkManager.getMovie: Не получилось конвертировать данные в модель.")
-                    completion(nil)
-                }
+            headers: ["X-API-KEY": Constants.apiKey]
+        ){
+            responseData in guard let data = responseData else {
+                print("NetworkManager.getMovie: Данные не обнаружены.")
+                completion(nil)
+                return
             }
+            
+            do {
+                try completion(JSONDecoder().decode(MovieViewModel.self, from: data))
+            } catch {
+                print("NetworkManager.getMovie: Не получилось конвертировать данные в модель.")
+                completion(nil)
+            }
+        }
     }
     
     // MARK: - Private Methods
     
-    private func loadData(url: String, parameters: Parameters?, headers: HTTPHeaders?, completion: @escaping (Data?) -> Void) {
+    private func loadData(
+        url: String,
+        parameters: Parameters?,
+        headers: HTTPHeaders?,
+        completion: @escaping (Data?) -> Void
+    ) {
         DispatchQueue.global(qos: .userInitiated).async {
             AF.request(
                 url,

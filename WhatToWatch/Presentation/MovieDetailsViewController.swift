@@ -1,5 +1,5 @@
 //
-//  ViewController.swift
+//  MovieDetailsViewController.swift
 //  WhatToWatch
 //
 //  Created by Ибрахим on 12.09.2023.
@@ -7,8 +7,10 @@
 
 import UIKit
 
-final class MovieDetailsViewController: UIViewController{
+final class MovieDetailsViewController: UIViewController {
+    
     // MARK: - Constants
+    
     private let movieId: Int
     
     private let networkManager: NetworkManagerProtocol
@@ -119,6 +121,7 @@ final class MovieDetailsViewController: UIViewController{
     }()
     
     // MARK: - Initializers
+    
     init(_ movieId: Int, networkManager: NetworkManagerProtocol = NetworkManager()) {
         self.networkManager = networkManager
         self.movieId = movieId
@@ -149,54 +152,53 @@ final class MovieDetailsViewController: UIViewController{
         scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         
-//        scrollView.addSubview(loadContentIndicator)
-//        loadContentIndicator.startAnimating()
-//        loadContentIndicator.translatesAutoresizingMaskIntoConstraints = false
-//
-//        loadImageIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-//        loadImageIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
+        scrollView.addSubview(loadContentIndicator)
+        loadContentIndicator.startAnimating()
+        loadContentIndicator.translatesAutoresizingMaskIntoConstraints = false
+
+        loadContentIndicator.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor).isActive = true
+        loadContentIndicator.centerYAnchor.constraint(equalTo: scrollView.centerYAnchor).isActive = true
     }
     
+    /// Обновляет UI после получения данных с сервера.
     private func dataDidLoad(_ data: MovieViewModel?) -> Void {
-
-        if let vm = data {
-                
-                loadContentIndicator.stopAnimating()
-                loadContentIndicator.isHidden = true
-                
-                setupView()
-                setupConstraits()
-                
-                imdbRatingLabel.text = "\(vm.ratingImdb ?? 0.0)"
-                kinopoiskRatingLabel.text = "\(vm.ratingKinopoisk ?? 0.0)"
-                ruNameLabel.text = vm.nameRu
-                originalNameLabel.text = vm.nameOriginal
-                descriptionLabel.text = vm.description ?? ""
-                yearValueLabel.text = "\(vm.year ?? 0)"
-                filmLengthValueLabel.text = "\(vm.filmLength ?? 0) мин."
-                
-                if let urlString = vm.posterUrl {
-                    networkManager.getImage(for: urlString) { image in
-                            self.previewImage.image = image ?? self.errorImage
-                            self.loadImageIndicator.stopAnimating()
-                            self.loadImageIndicator.isHidden = true
-                    }
+        if let viewModel = data {
+            loadContentIndicator.stopAnimating()
+            loadContentIndicator.isHidden = true
+            
+            setupView()
+            setupConstraits()
+            
+            imdbRatingLabel.text = "\(viewModel.ratingImdb ?? 0.0)"
+            kinopoiskRatingLabel.text = "\(viewModel.ratingKinopoisk ?? 0.0)"
+            ruNameLabel.text = viewModel.nameRu
+            originalNameLabel.text = viewModel.nameOriginal
+            descriptionLabel.text = viewModel.description ?? ""
+            yearValueLabel.text = "\(viewModel.year ?? 0)"
+            filmLengthValueLabel.text = "\(viewModel.filmLength ?? 0) мин."
+            
+            if let urlString = viewModel.posterUrl {
+                networkManager.getImage(for: urlString) { image in
+                    self.previewImage.image = image ?? self.errorImage
+                    self.loadImageIndicator.stopAnimating()
+                    self.loadImageIndicator.isHidden = true
                 }
             }
-            else{
-                self.loadContentIndicator.stopAnimating()
-                self.loadContentIndicator.isHidden = true
-                
-                let errorImageView = UIImageView()
-                errorImageView.image = self.errorImage
-                self.view.addSubview(errorImageView)
-                errorImageView.translatesAutoresizingMaskIntoConstraints = false
-                errorImageView.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
-                errorImageView.centerYAnchor.constraint(equalTo: self.view.centerYAnchor).isActive = true
-            }
+        } else {
+            self.loadContentIndicator.stopAnimating()
+            self.loadContentIndicator.isHidden = true
+            
+            let errorImageView = UIImageView()
+            errorImageView.image = self.errorImage
+            self.view.addSubview(errorImageView)
+            errorImageView.translatesAutoresizingMaskIntoConstraints = false
+            errorImageView.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
+            errorImageView.centerYAnchor.constraint(equalTo: self.view.centerYAnchor).isActive = true
         }
-
+    }
     
+    
+    /// Загружает данные о текущем фильме.
     private func loadData(){
         networkManager.getMovie(by: movieId, completion: dataDidLoad)
     }
@@ -287,16 +289,11 @@ final class MovieDetailsViewController: UIViewController{
         filmLengthValueLabel.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 16).isActive = true
         filmLengthValueLabel.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -16).isActive = true
         filmLengthValueLabel.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor, constant: -16).isActive = true
+        
+        
+        
+        
+        
+        
     }
 }
-
-//var faceViewModel = MovieViewModel(
-//    kinopoiskId: 123,
-//    nameRu: "Ровер",
-//    nameOriginal: "The Rover",
-//    posterUrl: "https://kinopoiskapiunofficial.tech/images/posters/kp/677780.jpg",
-//    ratingKinopoisk: 6.2,
-//    ratingImdb: 6.2,
-//    year: 2012,
-//    filmLength: 114,
-//    description: "Через 10 лет после глобального экономического коллапса закаленный герой-одиночка преследует банду, угнавшую его автомобиль.")

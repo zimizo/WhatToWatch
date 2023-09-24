@@ -7,6 +7,7 @@
 
 import UIKit
 
+/// Контроллер для отображения списка топ 100 фильмов.
 final class MoviesListController: UIViewController {
     // MARK: - Types
     struct MovieListItem {
@@ -24,11 +25,13 @@ final class MoviesListController: UIViewController {
     
     private lazy var activityIndicator: UIActivityIndicatorView = {
         let view = UIActivityIndicatorView(frame: CGRect(x: 220, y: 220, width: 140, height: 140))
+        view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
 
     private lazy var searchButton: UIButton = {
         var view = UIButton(configuration: .filled())
+        view.translatesAutoresizingMaskIntoConstraints = false
         view.setTitle("Поиск", for: .normal)
         view.addTarget(self, action:#selector(self.onSearchButtonClick), for: .touchUpInside)
         return view
@@ -36,45 +39,25 @@ final class MoviesListController: UIViewController {
     
     private lazy var getPopularButton: UIButton = {
         var view = UIButton(configuration: .filled())
+        view.translatesAutoresizingMaskIntoConstraints = false
         view.setTitle("Популярные фильмы", for: .normal)
         view.addTarget(self, action:#selector(self.onGetPopularButtonClick), for: .touchUpInside)
         return view
     }()
     
     private lazy var textField: UITextField = {
-        var view = UITextField()
-        view.placeholder = "Введите текст"
-        view.borderStyle = .roundedRect
-        view.layer.borderColor = UIColor.lightGray.cgColor
-        return view
-    }()
-    
-    private lazy var tableHeaderLabel: UILabel = {
-        let label = UILabel()
-        label.text = "Популярные фильмы"
-        label.font = .systemFont(ofSize: 16)
-        label.textColor = .systemGray2
-        return label
+        var textField = UITextField()
+        textField.translatesAutoresizingMaskIntoConstraints = false
+        textField.placeholder = "Введите текст"
+        textField.borderStyle = .roundedRect
+        textField.layer.borderColor = UIColor.lightGray.cgColor
+        return textField
     }()
     
     private lazy var tableView: UITableView = {
-        var view = UITableView(frame: CGRect.zero, style: .grouped)
+        var view = UITableView(frame: CGRect.zero, style: .plain)
+        view.translatesAutoresizingMaskIntoConstraints = false
         view.backgroundColor = .white
-        let header = UITableViewHeaderFooterView()
-        header.contentView.addSubview(tableHeaderLabel)
-        header.backgroundColor = .white
-        tableHeaderLabel.translatesAutoresizingMaskIntoConstraints = false
-        tableHeaderLabel.bottomAnchor.constraint(equalTo: header.bottomAnchor, constant: -10).isActive = true
-        tableHeaderLabel.trailingAnchor.constraint(equalTo: header.trailingAnchor, constant:  -10).isActive = true
-        tableHeaderLabel.leadingAnchor.constraint(equalTo: header.leadingAnchor, constant: 10).isActive = true
-
-        view.tableHeaderView = header
-        return view
-    }()
-    
-    private lazy var Cellsd: UITableViewCell = {
-        var view = UITableViewCell()
-            view.backgroundColor = .black
         return view
     }()
     
@@ -85,32 +68,14 @@ final class MoviesListController: UIViewController {
     init(networkManager: NetworkManagerProtocol = NetworkManager()) {
         self.networkManager = networkManager
         super.init(nibName: nil, bundle: nil)
-        self.networkManager.getTop100Movies(completion: dataDidLoad)
+        preloadData()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
-    // MARK: - IBAction
     
-    @objc private func onSearchButtonClick(){
-        activityIndicator.isHidden = false
-        
-        tableHeaderLabel.text = "Поиск по запросу: \(textField.text ?? "")"
-        
-        let searchString = textField.text ?? ""
-        networkManager.getMovies(for: searchString, completion: dataDidLoad)
-    }
-    
-    @objc private func onGetPopularButtonClick(){
-        activityIndicator.isHidden = false
-        
-        tableHeaderLabel.text = "Популярные фильмы"
-        networkManager.getTop100Movies(completion: dataDidLoad)
-    }
-
-    // MARK: - Private Methods
+    // MARK: - Life Cycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -120,6 +85,28 @@ final class MoviesListController: UIViewController {
         tableView.delegate = self
         setupView()
         setupConstraints()
+    }
+
+    // MARK: - Actions
+    
+    @objc private func onSearchButtonClick() {
+        activityIndicator.isHidden = false
+        
+        let searchString = textField.text ?? ""
+        networkManager.getMovies(for: searchString, completion: dataDidLoad)
+    }
+    
+    @objc private func onGetPopularButtonClick() {
+        activityIndicator.isHidden = false
+        textField.text = nil
+        networkManager.getTop100Movies(completion: dataDidLoad)
+    }
+
+    // MARK: - Private Methods
+    
+    private func preloadData() {
+        activityIndicator.startAnimating()
+        networkManager.getTop100Movies(completion: dataDidLoad)
     }
     
     private func convertDataModelToMovieListItem(_ model: MovieListItemModel) -> MovieListItem {
@@ -137,47 +124,42 @@ final class MoviesListController: UIViewController {
         )
     }
 
-
-    private func setupView(){
+    private func setupView() {
         view.addSubview(textField)
         view.addSubview(searchButton)
         view.addSubview(getPopularButton)
         view.addSubview(tableView)
         view.addSubview(activityIndicator)
-        activityIndicator.startAnimating()
-    }
-    private func setupConstraints(){
-
-        textField.translatesAutoresizingMaskIntoConstraints = false
-        textField.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16).isActive = true
-        textField.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 40).isActive = true
-        textField.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16).isActive = true
-        
-        searchButton.translatesAutoresizingMaskIntoConstraints = false
-        searchButton.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        searchButton.topAnchor.constraint(equalTo: textField.bottomAnchor, constant: 16).isActive = true
-        
-        getPopularButton.translatesAutoresizingMaskIntoConstraints = false
-        getPopularButton.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        getPopularButton.topAnchor.constraint(equalTo: searchButton.bottomAnchor, constant: 16).isActive = true
-        
-        tableView.translatesAutoresizingMaskIntoConstraints = false
-        tableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor).isActive = true
-        tableView.topAnchor.constraint(equalTo: getPopularButton.bottomAnchor, constant: 40).isActive = true
-        tableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor).isActive = true
-        tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16).isActive = true
-
-        activityIndicator.translatesAutoresizingMaskIntoConstraints = false
-        activityIndicator.centerXAnchor.constraint(equalTo: tableView.centerXAnchor).isActive = true
-        activityIndicator.centerYAnchor.constraint(equalTo: tableView.centerYAnchor).isActive = true
     }
     
-    private func dataDidLoad(_ data: MoviesListViewModel?){
-        if let listMovies = data {
-            self.data = listMovies.films.map({ self.convertDataModelToMovieListItem($0) })
-        } else {
+    private func setupConstraints() {
+        NSLayoutConstraint.activate([
+            textField.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
+            textField.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 40),
+            textField.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
+            
+            searchButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            searchButton.topAnchor.constraint(equalTo: textField.bottomAnchor, constant: 16),
+            
+            getPopularButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            getPopularButton.topAnchor.constraint(equalTo: searchButton.bottomAnchor, constant: 16),
+            
+            tableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            tableView.topAnchor.constraint(equalTo: getPopularButton.bottomAnchor, constant: 40),
+            tableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+            tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
+            
+            activityIndicator.centerXAnchor.constraint(equalTo: tableView.centerXAnchor),
+            activityIndicator.centerYAnchor.constraint(equalTo: tableView.centerYAnchor)
+        ])
+    }
+    
+    private func dataDidLoad(_ data: MoviesListViewModel?) {
+        guard let listMovies = data else {
             print("Не удалось получить список фильмов")
+            return
         }
+        self.data = listMovies.films.map({ self.convertDataModelToMovieListItem($0) })
         tableView.reloadData()
         activityIndicator.stopAnimating()
         activityIndicator.isHidden = true
@@ -211,9 +193,21 @@ extension MoviesListController: UITableViewDataSource {
         cell.configure(viewModel)
         return cell
     }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 120
+    }
+    
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        if let filmTitle = textField.text, !filmTitle.isEmpty {
+            return "Поиск по запросу: \(filmTitle)"
+        } else {
+            return "Популярные фильмы"
+        }
+    }
 }
 
-extension MoviesListController: UITableViewDelegate{
+extension MoviesListController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let viewModel = data[indexPath.row]
         let detailsView = MovieDetailsViewController(viewModel.kinopoiskId)
