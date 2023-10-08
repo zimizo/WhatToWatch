@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class MovieDetailsViewController: UIViewController {
+final class OldMovieDetailsViewController: UIViewController {
     
     // MARK: - Constants
     

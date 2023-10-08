@@ -33,7 +33,7 @@ final class MoviesTable: UITableView {
     // MARK: - Private Properties
     
     private var data = [MovieListItem]()
-    private var keyword: String?
+    private var title: String?
     
     // MARK: - Initializers
     init(networkManager: NetworkManagerProtocol = NetworkManager(), frame: CGRect, style: UITableView.Style) {
@@ -52,10 +52,16 @@ final class MoviesTable: UITableView {
     
     // MARK: - Public Methods
     func getTopMovies() {
+        title = "Популярные фильмы"
         networkManager.getTop100Movies(completion: self.dataDidLoad)
     }
-    func getMovies(for keyword: String) {
-        networkManager.getMovies(for: keyword, completion: self.dataDidLoad)
+    func getMovies(for keyword: String, filtres: [String: Any]) {
+        if keyword.isEmpty {
+            title = "Введите запрос"
+        } else {
+            self.title = "Поиск по запросу: \(keyword)"
+        }
+        networkManager.getMovies(for: keyword, filtres: filtres, completion: self.dataDidLoad)
     }
     
     // MARK: - Private methods
@@ -116,11 +122,7 @@ extension MoviesTable: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        if let keyword = keyword, !keyword.isEmpty {
-            return "Поиск по запросу: \(keyword)"
-        } else {
-            return "Популярные фильмы"
-        }
+        return title
     }
     
     private func dataDidLoad(_ data: MoviesListViewModel?) {
@@ -130,8 +132,6 @@ extension MoviesTable: UITableViewDataSource {
         }
         self.data = listMovies.films.map({ self.convertDataModelToMovieListItem($0) })
         reloadData()
-//        activityIndicator.stopAnimating()
-//        activityIndicator.isHidden = true
     }
 }
 

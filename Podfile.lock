@@ -1,20 +1,24 @@
 PODS:
   - Alamofire (5.8.0)
   - SwiftLint (0.52.4)
+  - TTRangeSlider (1.0.7)
 
 DEPENDENCIES:
   - Alamofire
   - SwiftLint
+  - TTRangeSlider
 
 SPEC REPOS:
   trunk:
     - Alamofire
     - SwiftLint
+    - TTRangeSlider
 
 SPEC CHECKSUMS:
   Alamofire: 0e92e751b3e9e66d7982db43919d01f313b8eb91
   SwiftLint: 1cc5cd61ba9bacb2194e340aeb47a2a37fda00b3
+  TTRangeSlider: 8cf72eca457c3b700c92eb0074be908c986e25ec
 
-PODFILE CHECKSUM: 66ed96a0c9652954f5c3959b8e82e4905e012589
+PODFILE CHECKSUM: 3c60f247eabc29ed45f923f249e77453109b47f0
 
 COCOAPODS: 1.12.1

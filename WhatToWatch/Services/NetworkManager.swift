@@ -9,9 +9,9 @@ import Alamofire
 import UIKit
 
 protocol NetworkManagerProtocol {
-    /// Запрашивает даные для списка при поиске фильмов по названию
+    /// Запрашивает даные для списка при поиске фильмов по названию и фильтрам
     /// Передает в замыкание MoviesListViewModel
-    func getMovies(for request: String, completion: @escaping (MoviesListViewModel?) -> Void)
+    func getMovies(for request: String, filtres: [String: Any], completion: @escaping (MoviesListViewModel?) -> Void)
     /// Запрашивает каринку по url
     /// Передает в замыкание UIImage
     func getImage(for url: String, completion: @escaping (UIImage?) -> Void)
@@ -53,12 +53,17 @@ final class NetworkManager: NetworkManagerProtocol {
         }
     }
     
-    func getMovies(for request: String, completion: @escaping (MoviesListViewModel?) -> Void) {
-        let url = "https://kinopoiskapiunofficial.tech/api/v2.1/films/search-by-keyword"
+    func getMovies(for request: String, filtres: [String: Any], completion: @escaping (MoviesListViewModel?) -> Void) {
+        let url = "https://kinopoiskapiunofficial.tech/api/v2.2/films"
+        var parameters: [String: Any] = ["keyword": request, "page": 1]
+        
+        filtres.forEach { key, value in
+            parameters[key] = value
+        }
         
         loadData(
             url: url,
-            parameters: ["keyword": request, "page": 1],
+            parameters: parameters,
             headers: ["X-API-KEY": Constants.apiKey]) { responseData in
             guard let data = responseData else {
                 print("NetworkManager.getMovies: Данные не обнаружены.")

@@ -12,18 +12,26 @@ final class SearchMoviesViewController: UIViewController {
     // MARK: - Constants
     private let cellId = "movieTableItem"
     private let networkManager: NetworkManagerProtocol
+    private let filtersView = FiltersViewController()
 
     // MARK: - Private Properties
-    private lazy var searchButton: UIButton = {
-        var view = UIButton(configuration: .filled())
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.setTitle("Поиск", for: .normal)
-        view.addTarget(
-            self,
-            action: #selector(self.onSearchButtonClick),
-            for: .touchUpInside
+    
+    private lazy var showFiltersButton: UIBarButtonItem = {
+//        var view = UIButton(configuration: .filled())
+//        view.translatesAutoresizingMaskIntoConstraints = false
+//        view.setTitle("Поиск", for: .normal)
+//        view.addTarget(
+//            self,
+//            action: #selector(self.onSearchButtonClick),
+//            for: .touchUpInside
+//        )
+//        return view
+        return UIBarButtonItem(
+            image: UIImage(systemName: "slider.horizontal.3"),
+            style: .plain,
+            target: self,
+            action: #selector(self.showFilterView)
         )
-        return view
     }()
     
     private lazy var textField: UITextField = {
@@ -71,14 +79,15 @@ final class SearchMoviesViewController: UIViewController {
 
     // MARK: - Actions
     
-    @objc private func onSearchButtonClick() {
-        let searchString = textField.text ?? ""
-        tableView.getMovies(for: searchString)
+    @objc private func showFilterView() {
+        self.present(filtersView, animated: true)
     }
 
     // MARK: - Private Methods
 
     private func setupView() {
+        title = "WhatToWatch"
+        navigationItem.rightBarButtonItem = showFiltersButton
         view.backgroundColor = .white
         navigationItem.searchController = searchController
         
@@ -89,16 +98,8 @@ final class SearchMoviesViewController: UIViewController {
     
     private func setupConstraints() {
         NSLayoutConstraint.activate([
-//            textField.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
-//            textField.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 40),
-//            textField.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
-//
-//            searchButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-//            searchButton.topAnchor.constraint(equalTo: textField.bottomAnchor, constant: 16),
-            
             tableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
-//            tableView.topAnchor.constraint(equalTo: searchButton.bottomAnchor, constant: 40),
+            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
             tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16)
         ])
@@ -118,9 +119,9 @@ extension SearchMoviesViewController: UISearchResultsUpdating {
             return
         }
         searchTimer?.invalidate()
-        searchTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false, block: {_ in 
-            self.tableView.getMovies(for: searchString)
-        })
+        searchTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false) {_ in
+            self.tableView.getMovies(for: searchString, filtres: [:])
+        }
 
     }
 }

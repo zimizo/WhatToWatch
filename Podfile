@@ -7,6 +7,8 @@ target 'WhatToWatch' do
 
   pod 'Alamofire'
   pod 'SwiftLint'
+  pod 'TTRangeSlider'
+  
 
   target 'WhatToWatchTests' do
     inherit! :search_paths
