@@ -17,7 +17,7 @@ protocol NetworkManagerProtocol {
     func getImage(for url: String, completion: @escaping (UIImage?) -> Void)
     /// Запрашивает даные для списка популярных фильмов
     /// Передает в замыкание MoviesListViewModel
-    func getTop100Movies(completion: @escaping (MoviesListViewModel?) -> Void)
+    func getTop200Movies(completion: @escaping (MoviesListViewModel?) -> Void)
     /// Запрашивает даные фильма по id
     /// Передает в замыкание MovieViewModel
     func getMovie(by movieId: Int, completion: @escaping (MovieViewModel?) -> Void)
@@ -30,7 +30,7 @@ final class NetworkManager: NetworkManagerProtocol {
     // MARK: - Constants
     
     private enum Constants {
-        static let apiKey = "e49616da-1372-491a-840e-81a87afe3e6e"
+        static let apiKey = "AE079VA-QECM7AJ-M9XSGD8-DAFS6PD"
     }
     
     // MARK: - Public Methods
@@ -54,9 +54,22 @@ final class NetworkManager: NetworkManagerProtocol {
     }
     
     func getMovies(for request: String, filtres: [String: Any], completion: @escaping (MoviesListViewModel?) -> Void) {
-        let url = "https://kinopoiskapiunofficial.tech/api/v2.2/films"
-        var parameters: [String: Any] = ["keyword": request, "page": 1]
-        
+        let url = "https://api.kinopoisk.dev/v1.3/movie"
+        var parameters: [String: Any] = [
+            "selectFields": [
+                "id",
+                "name",
+                "enName",
+                "poster",
+                "rating",
+                "year",
+                "movieLength",
+                "description"
+            ],
+            "name": request,
+            "limit": 200
+        ]
+
         filtres.forEach { key, value in
             parameters[key] = value
         }
@@ -80,11 +93,17 @@ final class NetworkManager: NetworkManagerProtocol {
         }
     }
     
-    func getTop100Movies(completion: @escaping (MoviesListViewModel?) -> Void) {
-        let url = "https://kinopoiskapiunofficial.tech/api/v2.2/films/top"
+    func getTop200Movies(completion: @escaping (MoviesListViewModel?) -> Void) {
+        let url = "https://api.kinopoisk.dev/v1.3/movie"
         loadData(
             url: url,
-            parameters: ["type": "TOP_100_POPULAR_FILMS"],
+            parameters: [
+                "limit": 200,
+                "top250": "!null",
+                "sortField": ["year", "rating.kp"],
+                "sortType": [-1, -1],
+                "type": "movie"
+            ],
             headers: ["X-API-KEY": Constants.apiKey]) { responseData in
                 
             guard let data = responseData else {
@@ -103,7 +122,7 @@ final class NetworkManager: NetworkManagerProtocol {
     }
     
     func getMovie(by movieId: Int, completion: @escaping (MovieViewModel?) -> Void) {
-        let url = "https://kinopoiskapiunofficial.tech/api/v2.2/films/\(movieId)"
+        let url = "https://api.kinopoisk.dev/v1.3/movie/\(movieId)"
         loadData(
             url: url,
             parameters: nil,

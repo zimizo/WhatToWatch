@@ -1,5 +1,5 @@
 //
-//  PreviewAndRatingsCell.swift
+//  PosterAndRatingCell.swift
 //  WhatToWatch
 //
 //  Created by Ибрахим on 05.10.2023.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class HeaderCell: UITableViewCell {
+final class PosterAndRatingCell: UITableViewCell {
     // MARK: - Types
     struct ViewModel {
         let imdbRating: String
@@ -31,18 +31,22 @@ final class HeaderCell: UITableViewCell {
     }()
     
     private lazy var kinopoiskRatingLabel: LabelSystem16 = {
-        LabelSystem16(labelText: "0.0")
+        let view = LabelSystem16(labelText: "0.0")
+        view.numberOfLines = 2
+        return view
     }()
     
     private lazy var imdbRatingLabel: LabelSystem16 = {
-        LabelSystem16(labelText: "0.0")
+        let view = LabelSystem16(labelText: "0.0")
+        view.numberOfLines = 2
+        return view
     }()
     
     private lazy var ratingStackView: UIStackView = {
         let view = UIStackView()
         view.axis = .vertical
         view.alignment = .center
-        view.spacing = 16
+        view.distribution = .equalCentering
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
@@ -69,8 +73,8 @@ final class HeaderCell: UITableViewCell {
     
     // MARK: - Public Methods
     func configure(imdbRating: String, kpRating: String) {
-        imdbRatingLabel.text = imdbRating
-        kinopoiskRatingLabel.text = kpRating
+        imdbRatingLabel.text = "IMDB\n\(imdbRating)"
+        kinopoiskRatingLabel.text = "Kinopoisk\n\(kpRating)"
     }
     
     func posterDidLoad(image: UIImage?) {
@@ -83,10 +87,9 @@ final class HeaderCell: UITableViewCell {
     
     // MARK: - Private Methods
     private func setupView() {
-        
-        ratingStackView.addArrangedSubview(LabelSystem16(labelText: "Kinopoisk"))
+        selectionStyle = .none
+
         ratingStackView.addArrangedSubview(kinopoiskRatingLabel)
-        ratingStackView.addArrangedSubview(LabelSystem16(labelText: "IMDB"))
         ratingStackView.addArrangedSubview(imdbRatingLabel)
         
         contentView.addSubview(previewImage)
@@ -95,16 +98,19 @@ final class HeaderCell: UITableViewCell {
         
     }
     private func setupConstraints() {
+        contentView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
+            contentView.heightAnchor.constraint(equalToConstant: 290),
+            
             previewImage.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 20),
             previewImage.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             previewImage.widthAnchor.constraint(equalToConstant: 187.5),
             previewImage.heightAnchor.constraint(equalToConstant: 250),
             
-            ratingStackView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 16),
+            ratingStackView.topAnchor.constraint(equalTo: previewImage.topAnchor, constant: 40),
             ratingStackView.leftAnchor.constraint(equalTo: previewImage.rightAnchor, constant: 16),
             ratingStackView.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -16),
-            ratingStackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -16)
+            ratingStackView.bottomAnchor.constraint(equalTo: previewImage.bottomAnchor, constant: -40)
         ])
         
     }

@@ -53,7 +53,7 @@ final class MoviesTable: UITableView {
     // MARK: - Public Methods
     func getTopMovies() {
         title = "Популярные фильмы"
-        networkManager.getTop100Movies(completion: self.dataDidLoad)
+        networkManager.getTop200Movies(completion: self.dataDidLoad)
     }
     func getMovies(for keyword: String, filtres: [String: Any]) {
         if keyword.isEmpty {
@@ -73,11 +73,11 @@ final class MoviesTable: UITableView {
     
     private func setupConstraints() {}
     
-    private func convertDataModelToMovieListItem(_ model: MovieListItemModel) -> MovieListItem {
+    private func convertDataModelToMovieListItem(_ model: MovieListSearchModel) -> MovieListItem {
         MovieListItem(
-            kinopoiskId: model.filmId,
-            title: model.nameRu,
-            posterUrl: model.posterUrl
+            kinopoiskId: model.id,
+            title: model.name,
+            posterUrl: model.poster?.url
         )
     }
     
@@ -130,7 +130,7 @@ extension MoviesTable: UITableViewDataSource {
             print("Не удалось получить список фильмов")
             return
         }
-        self.data = listMovies.films.map({ self.convertDataModelToMovieListItem($0) })
+        self.data = listMovies.docs.map({ self.convertDataModelToMovieListItem($0) })
         reloadData()
     }
 }

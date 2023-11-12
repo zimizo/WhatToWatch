@@ -10,12 +10,19 @@ import UIKit
 final class MovieDetailsViewController: UITableViewController {
     
     // MARK: - Constants
-    private let movieId: Int
-    
-    private let networkManager: NetworkManagerProtocol
+    enum MovieDetailsCells: CaseIterable {
+        case hederCell
+        case namesCell
+        case descriptionCell
+        case durationCell
+        case yearCell
+    }
     
     // MARK: - Private Properties
-    private var cells = [UITableViewCell]()
+    private let movieId: Int
+    private var viewModel: MovieViewModel?
+    private let networkManager: NetworkManagerProtocol
+    
     private lazy var loadContentIndicator: UIActivityIndicatorView = {
         let view = UIActivityIndicatorView(style: UIActivityIndicatorView.Style.large)
         view.translatesAutoresizingMaskIntoConstraints = false
@@ -44,28 +51,21 @@ final class MovieDetailsViewController: UITableViewController {
     }
     
     // MARK: - Private Methods
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        view.backgroundColor = .white
-    }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         loadData()
     }
     
+    private func setupView() {
+        view.backgroundColor = .white
+        view.addSubview(loadContentIndicator)
+    }
+    
     /// Обновляет UI после получения данных с сервера.
     private func dataDidLoad(_ data: MovieViewModel?) {
-        if let vm = data {
-            loadContentIndicator.stopAnimating()
-            loadContentIndicator.isHidden = true
-            
-            let headerCell = HeaderCell()
-            headerCell.configure(imdbRating: "\(vm.ratingImdb ?? 0.0)", kpRating: "\(vm.ratingKinopoisk ?? 0.0)")
-            if let urlString = vm.posterUrl {
-                networkManager.getImage(for: urlString, completion: headerCell.posterDidLoad)
-            }
-            cells.append(headerCell)
+        if let data = data {
+            viewModel = data
             
             self.tableView.reloadData()
             
@@ -83,16 +83,48 @@ final class MovieDetailsViewController: UITableViewController {
         networkManager.getMovie(by: movieId, completion: dataDidLoad)
     }
     
-    private func setupView() {
-        view.addSubview(loadContentIndicator)
-    }
-    
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        cells.count
+        MovieDetailsCells.allCases.count
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        return cells[indexPath.row]
+        if let viewModel = viewModel {
+            switch MovieDetailsCells.allCases[indexPath.row] {
+            case MovieDetailsCells.hederCell:
+                let cell = PosterAndRatingCell()
+                cell.configure(
+                    imdbRating: "\(viewModel.rating?.imdb ?? 0.0)",
+                    kpRating: "\(viewModel.rating?.kp ?? 0.0)"
+                )
+
+                networkManager.getImage(for: viewModel.poster?.url ?? "", completion: cell.posterDidLoad)
+                return cell
+            case MovieDetailsCells.namesCell:
+                let cell = NamesCell()
+                cell.configure(
+                    name: viewModel.name ?? "",
+                    enName: viewModel.enName ?? ""
+                )
+                return cell
+            case MovieDetailsCells.descriptionCell:
+                let cell = DescriptionCell()
+                cell.configure(description: viewModel.description ?? "")
+                return cell
+            case MovieDetailsCells.yearCell:
+                if let year = viewModel.year {
+                    let cell = CharacteristicCell()
+                    cell.configure(name: "Год производства:", value: "\(year)")
+                    return cell
+                }
+            case MovieDetailsCells.durationCell:
+                if let value = viewModel.movieLength {
+                    let cell = CharacteristicCell()
+                    cell.configure(name: "Продолжительность:", value: "\(value) мин.")
+                    return cell
+                }
+            }
+        }
+        return UITableViewCell()
     }
     
     private func setupConstraits() {
